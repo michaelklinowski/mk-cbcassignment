@@ -1,8 +1,5 @@
 # mk-cbcassignment
 
-
-# mk-cbcassignment
-
 Michael Klinowski interview assignment for CBC AV Product team</br>
 
 Since my expertise is more in process design and implementation (and not really in web development), I'm going to keep the scope of code creation to the functional aspect of social media platform post API calls.</br>
