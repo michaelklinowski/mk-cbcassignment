@@ -1,24 +1,16 @@
 # mk-cbcassignment
 
-<h1>Michael Klinowski interview assignment for CBC AV Product team</h1>
+<h2>Michael Klinowski interview assignment for CBC AV Product team</h2>
 </br>
 
 
 <h1>Preamble:</h1>
-</br>
-Throughout this I differentiate content and media objects.</br>
-A content object is a collection of data (title, description and such information), metadata (original broadcast date, runtime and the like), and media references (links to playable video, multilangauge audio tracks, closed captioning and subtitles, poster images and other consumable elements) that make up a presentation.</br>
-
-A media object is a reference to a consumable piece of media, and helpful metadata about that media.</br>
-(In this case, I use a URI as the reference, but in circumstances where media is stored as a database element, that element would be referenced directly)</br>
-
 Since my expertise is more in process design and implementation (and not really in web development), I'm going to keep the scope of code creation to the functional aspect of social media platform post API calls.</br>
 I will document the schemas, design choices and processes of the VCMS to implement this function.</br>
 This isn't the assignment as written, but it does represent my approach to media systems.</br>
-
+</br>
 
 <h1>Assumptions:</h1>
-</br>
 
 - The post is designed using the preexisting content-media association methodology in the CMS.</br>
   - I will not be creating the mechanism to assemble the post.</br>
@@ -31,7 +23,6 @@ This isn't the assignment as written, but it does represent my approach to media
 
 
 <h1>In scope:</h1>
-</br>
 
 - Social media post content object schema and fulfilled data</br>
 - Service definition schema and fulfilled data</br>
@@ -44,18 +35,9 @@ This isn't the assignment as written, but it does represent my approach to media
   - Defanged API call to service execution</br>
 - Successful post action creates unique media asset for external post</br>
 - Documentation</br>
-
-
-<h1>Nice to haves:</h1>
-</br>
-
-- Logging</br>
-- Input media asset requirement checking (e.g. Instagram needs an image or video)</br>
-</br>
 </br>
 
 <h1>Out of scope:</h1>
-</br>
 
 - Allow for post management after initial publication</br>
 - Allow for reposting - assume content duplication mechanism within CMS for reposts</br>
@@ -64,6 +46,14 @@ This isn't the assignment as written, but it does represent my approach to media
 	X 200 requests per 15 minutes, 300 requests per 3 hours</br>
 
 </br>
+
+<h1>Nice to haves:</h1>
+
+- Logging</br>
+- Input media asset requirement checking (e.g. Instagram needs an image or video)</br>
+</br>
+</br>
+
 
 <h2>Social media platform API documentation links:</h2>
 </br>
@@ -83,6 +73,11 @@ https://docs.x.com/x-api/posts/creation-of-a-post</br>
 
 
 <h1>User story:</h1>
+Throughout this I differentiate content and media objects.</br>
+A content object is a collection of data (title, description and such information), metadata (original broadcast date, runtime and the like), and media references (links to playable video, multilangauge audio tracks, closed captioning and subtitles, poster images and other consumable elements) that make up a presentation.</br>
+
+A media object is a reference to a consumable piece of media, and helpful metadata about that media.</br>
+(In this case, I use a URI as the reference, but in circumstances where media is stored as a database element, that element would be referenced directly)</br>
 
 A user creates a media post content object defining the display data and media associations of the post to be created.</br>
 This object may be created from a prexisting content object to be promoted, in which case it will be prepopulated with media associations.</br>
@@ -145,9 +140,7 @@ At the deployment and setup stage, we must define the social media services to b
   </tr>  
 </table>
 
-</br>
 ... and define required media types for each of the social media services...</br>
-</br>
 
 <h3>Media asset object "cmsmobj" schema:</h3>
 <table>
@@ -190,10 +183,9 @@ At the deployment and setup stage, we must define the social media services to b
 </table>
 
 </br>
-... as well as format definitions for creation of the media formats specified by the different social media services </br>
-</br>
-
+... as well as format definitions for creation of the media formats specified by the different social media services.</br>
 Here is an example schema for an image media format type:</br>
+
 <h3>media object processing schema:</h3>
 <table>
   <caption>mp_image</caption>
@@ -250,13 +242,12 @@ Here is an example schema for an image media format type:</br>
 </table>
 
 </br>
-<h1>Feature operation</h1></br>
-</br>
-To use the feature, the operator may:</br>
+<h1>Feature operation</h1>
+To use the feature, the operator may:
 
 - navigate to an existing content item in the CMS, and select the "new social media post" action 
 - create a new social media post content item</br>
-</br>
+
 This creates a new empty social media post object and immediately opens the edit view for the new post object.</br>
 </br>
 
@@ -353,6 +344,21 @@ This creates a new empty social media post object and immediately opens the edit
     <td>datetime</td>
     <td>display title of post for publication to Bluesky</td>
   </tr>
+  <tr>
+    <td>status_post_x</td>
+    <td>enum(CREATED,COMPLETE)</td>
+    <td>status of publication to X</td>
+  </tr>
+  <tr>
+    <td>status_post_instagram</td>
+    <td>enum(CREATED,COMPLETE)</td>
+    <td>status of publication to Instagram</td>
+  </tr>
+  <tr>
+    <td>status_post_bluesky</td>
+    <td>enum(CREATED,COMPLETE)</td>
+    <td>status of publication to Bluesky</td>
+  </tr>
 </table>
 
 </br>
@@ -361,13 +367,19 @@ A null value for schedule_post_<i>foo</i> indicates immediate publication. The c
 </br>
 
 </br>
-<h1>Subsequent media processing and publication workflow</h1></br>
+<h1>Subsequent media processing and publication workflow</h1>
 
 - A periodic media workflow process will identify post content objects with a "CREATED" status, collect media object type definitions for the selected services, create media objects of the required format types (with a stus of "CREATED"), update the post content object with associations to the created media objects, and update the post content object's status to "PROCESSING".</br>
 
-- A second media workflow process will identify media objects with a status of "CREATED", collect the service-specific media processing definitions, update the status to "PROCESSING", and queue a batch media processing tasks.</br>
+- A second media workflow process will identify media objects with a status of "CREATED", collect the service-specific media processing definitions, update the status to "PROCESSING", and queue a batch of media processing tasks.</br>
 
 - When the batch of media processing tasks completes, the workflow will update the media objects' status to "COMPLETE", and update the status of the post content object to "READY_FOR_PUBLICATION".</br>
 
-- 
+- A subsequent periodic workflow process will identify post content objects with "READY_FOR_PUBLICATION" status, compile all necessary references and submit a set of tasks to a processing queue, one for each targetted social media service.</br>
+Each task will have its own timestamp to support the per-service publication datetimes.</br>
+
+- This workflow will execute the publication API calls to the selected social media services' publication API endpoints. A success response from the endpoint will update the status_post_<i>foo</i> for the social media service published to.</br>
+
+- A final workflow periodic workflow will identify post content objects with "READY_FOR_PUBLICATION" status and all service_include_<i>foo</i> designated services' status_post_<i>foo</i> "COMPLETE" values, and update the post content object's status to "COMPLETE".</br>  
+  
 
