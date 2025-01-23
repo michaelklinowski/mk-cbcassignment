@@ -14,7 +14,7 @@ This isn't the assignment as written, but it does represent my approach to media
 
 - The post is designed using the preexisting content-media association methodology in the CMS.</br>
   - I will not be creating the mechanism to assemble the post.</br>
-  - I will describe a schema for social media post content types, and description of CMS code to support CRUD.</br>
+  - I will describe a schema for social media post content types, and description of CMS procedures to support CRUD.</br>
 - Media asset association will have generated any necessary child assets to all required service-specific specifications using existing media schemas and processing automations servicing the CMS.</br>
   - I will provide a populated configuration schema for these conversions</br>
 - There is already an X API access level account in place for the media organization.</br>
@@ -27,13 +27,11 @@ This isn't the assignment as written, but it does represent my approach to media
 - Social media post content object schema and fulfilled data</br>
 - Service definition schema and fulfilled data</br>
 - Processing schema for media fulfilment per social media service</br>
-- Mock CMS screens</br>
 - Functional features to perform publication</br>
   - One-to-many service posting</br>
   - API call mechanism per service</br>
   - API call rendering from data object</br>
-  - Defanged API call to service execution</br>
-- Successful post action creates unique media asset for external post</br>
+  - API call to service execution</br>
 - Documentation</br>
 </br>
 
@@ -45,13 +43,6 @@ This isn't the assignment as written, but it does represent my approach to media
 	Instagram 50 posts per 24 hour period, rolling</br>
 	X 200 requests per 15 minutes, 300 requests per 3 hours</br>
 
-</br>
-
-<h1>Nice to haves:</h1>
-
-- Logging</br>
-- Input media asset requirement checking (e.g. Instagram needs an image or video)</br>
-</br>
 </br>
 
 
@@ -381,5 +372,18 @@ Each task will have its own timestamp to support the per-service publication dat
 - This workflow will execute the publication API calls to the selected social media services' publication API endpoints. A success response from the endpoint will update the status_post_<i>foo</i> for the social media service published to.</br>
 
 - A final workflow periodic workflow will identify post content objects with "READY_FOR_PUBLICATION" status and all service_include_<i>foo</i> designated services' status_post_<i>foo</i> "COMPLETE" values, and update the post content object's status to "COMPLETE".</br>  
-  
+</br>
+
+<h1>publish-api</h1>
+
+This directory contains the script and artifacts used to demonstrate publication to Bluesky.
+I have found bash to be the most efficient and straightforward platform for proofs of concept and prototypes due to their portability and ease of translation into the language of choice for the platform.
+The posts visible in my Bluesky profile page were created with a single run of the publish-api.sh script demonstrating three modes of publication, text-only, post with image, and post with video.
+
+
+The publication method would be invoked by a periodic scheduler at the specified datetime. 
+As long as even one social media service does not support post scheduling, handling all services' should be handled by this single in-house mechanism. This also simplifies the association of the created posts back to the content object.
+
+
+
 

@@ -20,7 +20,6 @@ session_response=$(curl -s -X POST \
 
 
 # sample session response
-
 # session_response='{ \
 #   "did": "did:plc:p7ya5vaqejb3h4zhyipp5gpd",\
 #   "didDoc": {\
@@ -53,8 +52,8 @@ session_response=$(curl -s -X POST \
 #   "email": "warbler-speck.0g@icloud.com",\
 #   "emailConfirmed": true,\
 #   "emailAuthFactor": false,\
-#   "accessJwt": "eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NjAyNDMyLCJleHAiOjE3Mzc2MDk2MzIsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.yHQYmwazLJ-Bmumzdjk0We57ZOgLLngoWcj9sekGAzlBWAK_fHpvNWbbdaa0wKXcDuGS4Ye8Q92OMHeSPEvSCw",\
-#   "refreshJwt": "eyJ0eXAiOiJyZWZyZXNoK2p3dCIsImFsZyI6IkVTMjU2SyJ9.eyJzY29wZSI6ImNvbS5hdHByb3RvLnJlZnJlc2giLCJzdWIiOiJkaWQ6cGxjOnA3eWE1dmFxZWpiM2g0emh5aXBwNWdwZCIsImF1ZCI6ImRpZDp3ZWI6YnNreS5zb2NpYWwiLCJqdGkiOiJVZm1yV1dXREo2UlRGZDFzUmlhelVyOGk1M3BQN0NVem1md0RiNnhZQjdJIiwiaWF0IjoxNzM3NjAyNDMyLCJleHAiOjE3NDUzNzg0MzJ9._pt9QD37XmnTfL_gaQtgYHU8IMK0NlS9j68ejdLeCxNVJrxci-Au5J9dN3368f3aYPepaFbbnwqB54mdnAEm8A",\
+#   "accessJwt": "eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ...",\
+#   "refreshJwt": "eyJ0eXAiOiJyZWZyZXNoK2p3dCIsImFsZyI6IkVTMjU2SyJ9...",\
 #   "active": true\
 # }'
 
@@ -64,8 +63,7 @@ currentjwt=$(echo ${currentjwt//\"/})
 # echo ${currentjwt}
 
 # optionally maintain the current access token to avoid exceeding the session rate limit
-
-#currentjwt="eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NjAyNDMyLCJleHAiOjE3Mzc2MDk2MzIsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.yHQYmwazLJ-Bmumzdjk0We57ZOgLLngoWcj9sekGAzlBWAK_fHpvNWbbdaa0wKXcDuGS4Ye8Q92OMHeSPEvSCw"
+#currentjwt="eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ..."
 
 # set the current datetime inteh correct format
 currentdate=$(echo $(date --iso-8601=seconds ))
@@ -137,5 +135,12 @@ video_size=$(echo ${video_size//\"/})
 currentdate=$(echo $(date --iso-8601=seconds ))
 
 video_post_response=$(curl -s -X POST -H 'Content-Type: application/json' -H "Authorization: Bearer ${currentjwt}" -d "{ \"collection\": \"app.bsky.feed.post\", \"repo\": \"${bluesky_user}\", \"record\": { \"text\": \"${bluesky_video_text}\", \"createdAt\": \"${currentdate}\", \"\$type\": \"app.bsky.feed.post\", \"embed\": { \"\$type\": \"app.bsky.embed.video\", \"alt\": \"${bluesky_video_alt_text}\", \"video\": { \"\$type\": \"blob\", \"ref\": { \"\$link\": \"${video_blob}\" }, \"mimeType\": \"${video_mimeType}\", \"size\": ${video_size} } } } }" https://bsky.social/xrpc/com.atproto.repo.createRecord)
+
+
+# post resposes look like this:
+# {"uri":"at://did:plc:p7ya5vaqejb3h4zhyipp5gpd/app.bsky.feed.post/3lgexfse2gu24","cid":"bafyreiby2yxs2mftdo3tzvvigr5mvuabnyyrasylih26rq5slcpwfhombq","commit":{"cid":"bafyreickj5koeildo22loqxricbm273uhugqdobetkj2iyh2okpxeajrrm","rev":"3lgexfseace24"},"validationStatus":"valid"}
+
+# successful publications can assemble a viewable post URI reference from the service domain, ${bluesky_user} and a parsed "uri" elemnt from the json response
+# these references will be associated (as a media_asset_association) with the post content object in the CMS
 
 exit 0
