@@ -1,0 +1,236 @@
+pseudocode planning
+
+this is a workflow - maybe make this an API if straightforward but probably just accept some txt structured data
+
+
+receive task queue stuctured data
+parse
+# assemble API execution data
+
+# assemble API call data
+
+
+
+
+
+# render API call
+
+basic post record
+{
+  "$type": "app.bsky.feed.post",
+  "text": "Hello World!",
+  "createdAt": "2023-08-07T05:31:12.156888Z"
+}
+
+lexicon record - platonic
+
+{
+  "lexicon": 1,
+  "id": "app.bsky.feed.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record containing a Bluesky post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["text", "createdAt"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300,
+            "description": "The primary post content. May be an empty string, if there are embeds."
+          },
+          "entities": {
+            "type": "array",
+            "description": "DEPRECATED: replaced by app.bsky.richtext.facet.",
+            "items": { "type": "ref", "ref": "#entity" }
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
+            "items": { "type": "ref", "ref": "app.bsky.richtext.facet" }
+          },
+          "reply": { "type": "ref", "ref": "#replyRef" },
+          "embed": {
+            "type": "union",
+            "refs": [
+              "app.bsky.embed.images",
+              "app.bsky.embed.video",
+              "app.bsky.embed.external",
+              "app.bsky.embed.record",
+              "app.bsky.embed.recordWithMedia"
+            ]
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of post primary text content.",
+            "maxLength": 3,
+            "items": { "type": "string", "format": "language" }
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values for this post. Effectively content warnings.",
+            "refs": ["com.atproto.label.defs#selfLabels"]
+          },
+          "tags": {
+            "type": "array",
+            "description": "Additional hashtags, in addition to any included in post text and facets.",
+            "maxLength": 8,
+            "items": { "type": "string", "maxLength": 640, "maxGraphemes": 64 }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this post was originally created."
+          }
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "required": ["root", "parent"],
+      "properties": {
+        "root": { "type": "ref", "ref": "com.atproto.repo.strongRef" },
+        "parent": { "type": "ref", "ref": "com.atproto.repo.strongRef" }
+      }
+    },
+    "entity": {
+      "type": "object",
+      "description": "Deprecated: use facets instead.",
+      "required": ["index", "type", "value"],
+      "properties": {
+        "index": { "type": "ref", "ref": "#textSlice" },
+        "type": {
+          "type": "string",
+          "description": "Expected values are 'mention' and 'link'."
+        },
+        "value": { "type": "string" }
+      }
+    },
+    "textSlice": {
+      "type": "object",
+      "description": "Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
+
+
+
+
+Images Embeds
+Images are also embedded objects in a post. This example code demonstrates reading an image file from disk and uploading it, capturing a blob in the response:
+
+IMAGE_PATH = "./example.png"
+IMAGE_MIMETYPE = "image/png"
+IMAGE_ALT_TEXT = "brief alt text description of the image"
+
+with open(IMAGE_PATH, "rb") as f:
+    img_bytes = f.read()
+
+# this size limit is specified in the app.bsky.embed.images lexicon
+if len(img_bytes) > 1000000:
+    raise Exception(
+        f"image file size too large. 1000000 bytes maximum, got: {len(img_bytes)}"
+    )
+
+# TODO: strip EXIF metadata here, if needed
+
+resp = requests.post(
+    "https://bsky.social/xrpc/com.atproto.repo.uploadBlob",
+    headers={
+        "Content-Type": IMAGE_MIMETYPE,
+        "Authorization": "Bearer " + session["accessJwt"],
+    },
+    data=img_bytes,
+)
+resp.raise_for_status()
+blob = resp.json()["blob"]
+
+The blob object, as JSON, would look something like:
+
+{
+    "$type": "blob",
+    "ref": {
+        "$link": "bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa"
+    },
+    "mimeType": "image/png",
+    "size": 760898
+}
+
+The blob is then included in a app.bsky.embed.images array, along with an alt-text string. The alt field is required for each image. Pass an empty string if there is no alt text available.
+
+post["embed"] = {
+    "$type": "app.bsky.embed.images",
+    "images": [{
+        "alt": IMAGE_ALT_TEXT,
+        "image": blob,
+    }],
+}
+
+
+A complete post record, containing two images, would look something like:
+
+{
+  "$type": "app.bsky.feed.post",
+  "text": "example post with multiple images attached",
+  "createdAt": "2023-08-07T05:49:35.422015Z",
+  "embed": {
+    "$type": "app.bsky.embed.images",
+    "images": [
+      {
+        "alt": "brief alt text description of the first image",
+        "image": {
+          "$type": "blob",
+          "ref": {
+            "$link": "bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa"
+          },
+          "mimeType": "image/webp",
+          "size": 760898
+        }
+      },
+      {
+        "alt": "brief alt text description of the second image",
+        "image": {
+          "$type": "blob",
+          "ref": {
+            "$link": "bafkreif3fouono2i3fmm5moqypwskh3yjtp7snd5hfq5pr453oggygyrte"
+          },
+          "mimeType": "image/png",
+          "size": 13208
+        }
+      }
+    ]
+  }
+}
+
+
+
+execute API call
+
+http post https://bsky.social/xrpc/com.atproto.server.createSession \
+        identifier="$BLUESKY_HANDLE" \
+        password="$BLUESKY_APP_PASSWORD"
+
+http post https://bsky.social/xrpc/com.atproto.repo.createRecord \
+    Authorization:"Bearer $AUTH_TOKEN" \
+    repo="$BLUESKY_HANDLE" \
+    collection=app.bsky.feed.post \
+    record:="{\"text\": \"Hello world! I posted this via the API.\", \"createdAt\": \"`date -u +"%Y-%m-%dT%H:%M:%SZ"`\"}"
+
+
+
+handle response
+
+just do BLuesky i think as an example of mechanism
+
+
+
+
+
