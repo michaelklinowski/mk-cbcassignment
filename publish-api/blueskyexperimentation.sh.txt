@@ -1,0 +1,177 @@
+
+
+WORKING:
+
+# get jwi token
+curl -X POST -H 'Content-Type: application/json' -d "{ \"identifier\": \"letsrockyeeaaahhhh.bsky.social\", \"password\": \"fyqfoh-6getKu-baqdin\" }" "https://bsky.social/xrpc/com.atproto.server.createSession"
+
+
+
+# post simple message
+curl -X POST -H 'Content-Type: application/json' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDg1Mjg4LCJleHAiOjE3Mzc0OTI0ODgsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.6WBwGBmotAzKUZ73s-LDo7up5-jz_nKQ_Lmazy5rueS-m_z0boPD-k6gGKuxLVS13U93tjUxAfaL3dAEOcToKQ" -d "{ \"collection\": \"app.bsky.feed.post\", \"repo\": \"letsrockyeeaaahhhh.bsky.social\", \"record\": { \"text\": \"Currently working on posting via API. If you see this, it worked.\", \"createdAt\": \"2025-01-21T13:44:00Z\", \"\$type\": \"app.bsky.feed.post\" } }" https://bsky.social/xrpc/com.atproto.repo.createRecord
+
+# result:
+holy crap
+at://did:plc:p7ya5vaqejb3h4zhyipp5gpd/app.bsky.feed.post/3lgbje3pcnk26
+
+
+
+# upload image, get blob
+
+curl -X POST -H 'Content-Type: image/png' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDg3MDU2LCJleHAiOjE3Mzc0OTQyNTYsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.84VRxDtwjA3xk5qO256ow5o0rgajjUy9ea3Wfm0QPkhUgygM0I9DPT4HVdgbV-1qPFvj6ruGB3eQE5Ml1mTxeA" -d "{ \"image_bytes\": \"104747\" }" -T "IMG_8456.JPG" https://bsky.social/xrpc/com.atproto.repo.uploadBlob
+
+# success:
+{"blob":{"$type":"blob","ref":{"$link":"bafkreihfyajuq7rqg3sg5zf742qcv2whfxzwcnpfi2xnjwmvjhnlbmdswi"},"mimeType":"image/png","size":27}}
+NOPE
+
+curl -X POST -H 'Content-Type: image/png' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDg4OTY0LCJleHAiOjE3Mzc0OTYxNjQsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.ONK3B7JwTqjL0uTWmbs-I9WweJmQXhaAHnAIsU-quoRayqOtA1yftvqDnKyPPBPt59P8JBVowreAo9wgC0TKHQ" -d "{ \"@/mnt/c/Users/Michael/Documents/cbcassignment/IMG_8456.JPG\" }"  https://bsky.social/xrpc/com.atproto.repo.uploadBlob
+
+ahhhhh, data is the raw bytes of the image...
+
+--data-binary
+
+yay!
+{"blob":{"$type":"blob","ref":{"$link":"bafkreifwzvgmlr3dg7jhxivxkxxudz6wddkcfmpt2inbhji5epmgaoon74"},"mimeType":"image/png","size":104775}}
+nope... something wrong withthe raw data now?
+
+curl -X POST -H 'Content-Type: image/png' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDkwMjAxLCJleHAiOjE3Mzc0OTc0MDEsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.rIYc-zujSGlh0HEwUXPLrAGFBu7tt-lLRvnrwAJ5U0L1PoHGdLlZ-YVtoWpUP--v0xwau8UgVfhl-5QvNDQksA" -T "@/mnt/c/Users/Michael/Documents/cbcassignment/IMG_8456.JPG\"  https://bsky.social/xrpc/com.atproto.repo.uploadBlob
+
+
+
+
+
+
+
+
+
+# post with image using blob
+curl -X POST -H 'Content-Type: application/json' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDkwMjAxLCJleHAiOjE3Mzc0OTc0MDEsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.rIYc-zujSGlh0HEwUXPLrAGFBu7tt-lLRvnrwAJ5U0L1PoHGdLlZ-YVtoWpUP--v0xwau8UgVfhl-5QvNDQksA" -d "{ \"collection\": \"app.bsky.feed.post\", \"repo\": \"letsrockyeeaaahhhh.bsky.social\", \"record\": { \"text\": \"Trying an image via API. If you see a tiny transistor, it worked.\", \"createdAt\": \"2025-01-21T15:16:00Z\", \"\$type\": \"app.bsky.feed.post\", \"embed\": { \"\$type\": \"app.bsky.embed.images\", \"images\": [ { \"alt\": \"a tiny transistor\", \"image\": { \"\$type\": \"blob\", \"ref\": { \"\$link\": \"bafkreihhhwstgdg6hcgc4kdd7yz6btoucvyj7w5dovg4y6jujbl4omwrhq\" }, \"mimeType\": \"image/png\", \"size\": 104775 } } ] } } }" https://bsky.social/xrpc/com.atproto.repo.createRecord
+
+# worked??
+i think this worked:
+
+{"uri":"at://did:plc:p7ya5vaqejb3h4zhyipp5gpd/app.bsky.feed.post/3lgbncweuex2k","cid":"bafyreicoyjllg73qq36subvfagtsff4gj7ssxeocpo66ge4bepafbtapvy","commit":{"cid":"bafyreic63b4zpn7gojkpljg4dqyx27icqvgkghhv6vw5bd3kjurktfibdu","rev":"3lgbncwf2ah2k"},"validationStatus":"valid"}
+
+
+
+not this one:
+{"uri":"at://did:plc:p7ya5vaqejb3h4zhyipp5gpd/app.bsky.feed.post/3lgbmbpsbca2n","cid":"bafyreice3zr5llbinl4iaupolscu2a67kd37fiib4iygpyxr7vlqgzu6ru","commit":{"cid":"bafyreiepk7b4jtpacm77rngpk6eoe27vw2gbrqrkoefnggwffhdiikayfa","rev":"3lgbmbpsi4y2n"},"validationStatus":"valid"}m
+
+
+
+
+   \"embed\": { \"$type\": \"app.bsky.embed.images\", \"images\": [{ \"alt\": \"a tiny transistor\", \"image\": { \"$type\": \"blob\", \"ref\": { \"$link\": \"bafkreihfyajuq7rqg3sg5zf742qcv2whfxzwcnpfi2xnjwmvjhnlbmdswi\" }, \"mimeType\": \"image/png\", \"size\": 27 }}]}
+
+
+"embed": {
+    "$type": "app.bsky.embed.images",
+    "images": [
+      {
+        "alt": "brief alt text description of the first image",
+        "image": {
+          "$type": "blob",
+          "ref": {
+            "$link": "bafkreibabalobzn6cd366ukcsjycp4yymjymgfxcv6xczmlgpemzkz3cfa"
+          },
+          "mimeType": "image/webp",
+          "size": 760898
+        }
+      },
+      {
+        "alt": "brief alt text description of the second image",
+        "image": {
+          "$type": "blob",
+          "ref": {
+            "$link": "bafkreif3fouono2i3fmm5moqypwskh3yjtp7snd5hfq5pr453oggygyrte"
+          },
+          "mimeType": "image/png",
+          "size": 13208
+        }
+      }
+    ]
+  }
+}
+
+# ok trying video
+
+
+curl -X POST -H 'Content-Type: video/mp4' -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDkwMjAxLCJleHAiOjE3Mzc0OTc0MDEsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.rIYc-zujSGlh0HEwUXPLrAGFBu7tt-lLRvnrwAJ5U0L1PoHGdLlZ-YVtoWpUP--v0xwau8UgVfhl-5QvNDQksA" -T "@/mnt/c/Users/Michael/Documents/cbcassignment/smoker.mp4"  https://bsky.social/xrpc/app.bsky.video.uploadVideo
+
+
+
+
+XRPCNotSupported
+
+
+
+
+
+
+
+
+   "embed": {
+            "type": "union",
+            "refs": [
+              "app.bsky.embed.images",
+              "app.bsky.embed.video",
+              "app.bsky.embed.external",
+              "app.bsky.embed.record",
+              "app.bsky.embed.recordWithMedia"
+            ]
+          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Post "Hello, world" to your feed
+POST_FEED_URL='https://bsky.social/xrpc/com.atproto.repo.createRecord'
+POST_RECORD="{ \"collection\": \"app.bsky.feed.post\", \"repo\": \"${DID}\", \"record\": { \"text\": \"Hello, world\", \"createdAt\": \"$(date +%Y-%m-%dT%H:%M:%S.%3NZ)\", \"\$type\": \"app.bsky.feed.post\" } }"
+curl -X POST \
+    -H "Authorization: Bearer ${API_KEY}" \
+    -H 'Content-Type: application/json' \
+    -d "$POST_RECORD" \
+    "$POST_FEED_URL" | jq -r
+
+
+
+
+API_KEY_URL='https://bsky.social/xrpc/com.atproto.server.createSession'
+POST_DATA="{ \"identifier\": \"${DID}\", \"password\": \"${APP_PASSWORD}\" }"
+
+
+
+
+
+# Get API key with the app password
+API_KEY_URL='https://bsky.social/xrpc/com.atproto.server.createSession'
+POST_DATA="{ \"identifier\": \"${DID}\", \"password\": \"${APP_PASSWORD}\" }"
+export API_KEY=$(curl -X POST \
+    -H 'Content-Type: application/json' \
+    -d "$POST_DATA" \
+    "$API_KEY_URL" | jq -r .accessJwt)
+
+
+
+
+
+
+
+curl -X POST -H "Authorization: Bearer eyJ0eXAiOiJhdCtqd3QiLCJhbGciOiJFUzI1NksifQ.eyJzY29wZSI6ImNvbS5hdHByb3RvLmFjY2VzcyIsInN1YiI6ImRpZDpwbGM6cDd5YTV2YXFlamIzaDR6aHlpcHA1Z3BkIiwiaWF0IjoxNzM3NDgzNzE3LCJleHAiOjE3Mzc0OTA5MTcsImF1ZCI6ImRpZDp3ZWI6dHJ1ZmZsZS51cy1lYXN0Lmhvc3QuYnNreS5uZXR3b3JrIn0.Ak2pKQpXSl9WatePfGlMPDaGVrb_oBBZgnosGmFD_yWFVt-5hmW09WRoSvozJjqXx_AOBMhccEfGE5mhD8el8A" -H 'Content-Type: application/json' -d "repo: session["did"], $type": "app.bsky.feed.post", "text": "Currently working on posting via API. If you see this, it worked.",
+  "createdAt": "2023-08-07T05:31:12.156888Z"
+}
+" "https://bsky.social/xrpc/com.atproto.repo.createRecord"
+
+
+
