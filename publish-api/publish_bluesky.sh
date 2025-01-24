@@ -84,6 +84,8 @@ https://bsky.social/xrpc/com.atproto.repo.createRecord )
 
 
 # post with image
+# in the prodcution system, media references would be externally accessible URIs to the associated CMS media assets generated on a per service basis
+
 # upload image as blob
 image_blob_response=$(curl -s -X POST -H 'Content-Type: image/jpeg' -H "Authorization: Bearer ${currentjwt}" -T "${bluesky_image}" https://bsky.social/xrpc/com.atproto.repo.uploadBlob)
 

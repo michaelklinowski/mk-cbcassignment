@@ -1,6 +1,6 @@
 # mk-cbcassignment
 
-<h2>Michael Klinowski interview assignment for CBC AV Product team</h2>
+<h2>Michael Klinowski interview assignment - Development Team Lead, AV Platform</h2>
 </br>
 
 
@@ -10,6 +10,7 @@ I will document the schemas, design choices and processes of the VCMS to impleme
 This isn't the assignment as written, but it does represent my approach to media systems.</br>
 </br>
 
+
 <h1>Assumptions:</h1>
 
 - The post is designed using the preexisting content-media association methodology in the CMS.</br>
@@ -18,7 +19,7 @@ This isn't the assignment as written, but it does represent my approach to media
 - Media asset association will have generated any necessary child assets to all required service-specific specifications using existing media schemas and processing automations servicing the CMS.</br>
   - I will provide a populated configuration schema for these conversions</br>
 - There is already an X API access level account in place for the media organization.</br>
-- There is an existing task scheduling function facilitating timed processing actions (in this case, performing API publication calls)</br>
+- There is an existing task scheduling function facilitating timed processing actions (in this case, performing API publication calls).</br>
 </br>
 
 
@@ -35,6 +36,7 @@ This isn't the assignment as written, but it does represent my approach to media
 - Documentation</br>
 </br>
 
+
 <h1>Out of scope:</h1>
 
 - Allow for post management after initial publication</br>
@@ -44,36 +46,22 @@ This isn't the assignment as written, but it does represent my approach to media
 	X 200 requests per 15 minutes, 300 requests per 3 hours</br>
 
 </br>
-
-
-<h2>Social media platform API documentation links:</h2>
-</br>
-https://docs.bsky.app/blog/create-post</br>
-https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login/content-publishing</br>
-https://www.postman.com/xapidevelopers/twitter-s-public-workspace/request/cva25a0/create-a-tweet</br>
-https://docs.x.com/x-api/posts/creation-of-a-post</br>
-</br>
-</br>
-
-<h2>Additional documentation:</h2>
-</br>
-- Deployment plan</br>
-- CICD plan</br>
-
 </br>
 
 
-<h1>User story:</h1>
-Throughout this I differentiate content and media objects.</br>
+<h1>Intro</h1>
+Throughout this I differentiate between content and media objects.</br>
 A content object is a collection of data (title, description and such information), metadata (original broadcast date, runtime and the like), and media references (links to playable video, multilangauge audio tracks, closed captioning and subtitles, poster images and other consumable elements) that make up a presentation.</br>
 
 A media object is a reference to a consumable piece of media, and helpful metadata about that media.</br>
-(In this case, I use a URI as the reference, but in circumstances where media is stored as a database element, that element would be referenced directly)</br>
+(In this case, I use a URI as the reference, but in circumstances where media is stored as a database element, that element would be referenced directly.)</br>
 
 A user creates a media post content object defining the display data and media associations of the post to be created.</br>
 This object may be created from a prexisting content object to be promoted, in which case it will be prepopulated with media associations.</br>
 The user may electively add or remove media object associations using the preexisting CMS functionality.</br>
 In addition, body text and publication scheduling data can be input on a per-service basis.</br>
+
+The schema definition tables below are minimal, only defining the functional data. There will be other data points required to support CMS functions not listed here.</br>  
 </br>
 
 <h1>Feature setup</h1>
@@ -249,6 +237,7 @@ This creates a new empty social media post object and immediately opens the edit
     <col />
     <col span="5" class="name" />
     <col span="5" class="type" />
+    <col span="5" class="notes" />
   </colgroup>
   <tr>
     <th scope="col">name</th>
@@ -263,7 +252,7 @@ This creates a new empty social media post object and immediately opens the edit
   <tr>
     <td>status</td>
     <td>enum</br>(CREATED,PROCESSING,</br>READY_FOR_PUBLICATION,PUBLISHED)</td>
-    <td>status flags to reflect operational stages and drive </td>
+    <td>status flags to reflect operational stages and facilitate processing workflows</td>
   </tr>
   <tr>
     <td>type</td>
@@ -360,7 +349,7 @@ A null value for schedule_post_<i>foo</i> indicates immediate publication. The c
 </br>
 <h1>Subsequent media processing and publication workflow</h1>
 
-- A periodic media workflow process will identify post content objects with a "CREATED" status, collect media object type definitions for the selected services, create media objects of the required format types (with a stus of "CREATED"), update the post content object with associations to the created media objects, and update the post content object's status to "PROCESSING".</br>
+- A periodic media workflow process will identify post content objects with a "CREATED" status, collect media object type definitions for the selected services, create media objects of the required format types (with a status of "CREATED"), update the post content object with associations to the created media objects, and update the post content object's status to "PROCESSING".</br>
 
 - A second media workflow process will identify media objects with a status of "CREATED", collect the service-specific media processing definitions, update the status to "PROCESSING", and queue a batch of media processing tasks.</br>
 
@@ -383,7 +372,15 @@ The posts visible in my Bluesky profile page were created with a single run of t
 
 The publication method would be invoked by a periodic scheduler at the specified datetime. 
 As long as even one social media service does not support post scheduling, handling all services' should be handled by this single in-house mechanism. This also simplifies the association of the created posts back to the content object.
+</br>
+</br>
 
 
-
-
+<h2>Social media platform API documentation links:</h2>
+</br>
+https://docs.bsky.app/blog/create-post</br>
+https://developers.facebook.com/docs/instagram-platform/instagram-api-with-facebook-login/content-publishing</br>
+https://www.postman.com/xapidevelopers/twitter-s-public-workspace/request/cva25a0/create-a-tweet</br>
+https://docs.x.com/x-api/posts/creation-of-a-post</br>
+</br>
+</br>
