@@ -366,10 +366,19 @@ Each task will have its own timestamp to support the per-service publication dat
 <h1>publish-api</h1>
 
 This directory contains the script and artifacts used to demonstrate publication to Bluesky.
-I have found bash to be the most efficient and straightforward platform for proofs of concept and prototypes due to their portability and ease of translation into the language of choice for the platform.
-The posts visible in my Bluesky profile page were created with a single run of the publish-api.sh script demonstrating three modes of publication, text-only, post with image, and post with video.
+I have found Unix bash to be the most efficient and straightforward platform for proofs of concept and prototypes due to portability and ease of translation into the language of choice for the platform.
+The posts visible in my Bluesky profile page were created with a single run of the publish-api.sh script demonstrating three modes of publication, text-only, post with image, and post with video.</br>
 
+<h3>Script execution</h3>
+This script depends on jq for json filtering.
+If required, install using your Unix install's package manager (typically apt or apt-get).
 
+A valid Bluesky user profile and password will need to be included in the .config file.
+
+<h3>Execution</h3>
+./publish_bluesky.sh 20250121_publish_bluesky.config
+
+</br>
 The publication method would be invoked by a periodic scheduler at the specified datetime. 
 As long as even one social media service does not support post scheduling, handling all services' should be handled by this single in-house mechanism. This also simplifies the association of the created posts back to the content object.
 </br>
