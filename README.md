@@ -367,14 +367,12 @@ Each task will have its own timestamp to support the per-service publication dat
 
 This directory contains the script and artifacts used to demonstrate publication to Bluesky.
 I have found Unix bash to be the most efficient and straightforward platform for proofs of concept and prototypes due to portability and ease of translation into the language of choice for the platform.
-The posts visible in my Bluesky profile page were created with a single run of the publish-api.sh script demonstrating three modes of publication, text-only, post with image, and post with video.</br>
+The posts visible in my Bluesky profile page at https://@letsrockyeeaaahhhh.bsky.social were created with a single run of the publish-api.sh script demonstrating three modes of publication, text-only, post with image, and post with video.</br>
 
 This script depends on jq for json filtering.</br>
 If required, install using your Unix install's package manager (typically apt or apt-get).
 
 A valid Bluesky user profile and password will need to be included in the .config file.
-
-</br>
 </br>
 ./publish_bluesky.sh 20250121_publish_bluesky.config
 </br>
